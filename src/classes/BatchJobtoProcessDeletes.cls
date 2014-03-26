@@ -28,7 +28,7 @@ global class BatchJobtoProcessDeletes implements Database.Batchable<sObject> {
 	
 	Messaging.Singleemailmessage email = new Messaging.Singleemailmessage();
 	string[] toAddress = new String[]{};
-	toAddress.add('vkanuganti@gerentllc.com');
+	toAddress.add('vkanuganti@gerentllc.com'); //Email address to send job status
 	email.setToAddresses(toAddress);
 	email.setSubject('Apex Batch Job : ' + a.MethodName + ' - Status: ' + a.Status);
 	email.setPlainTextBody('The batch Apex job processed with total number of items: ' + a.TotalJobItems + ' - JobItemsProcessed - ' +a.JobItemsProcessed + ' - with number of errors - ' + a.NumberOfErrors);
