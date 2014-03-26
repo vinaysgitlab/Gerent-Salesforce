@@ -1,0 +1,20 @@
+<apex:page controller="CalController" >
+<apex:SectionHeader title="Calculator"/>
+    <apex:form >
+        <apex:pageBlock title="Basic">
+            <apex:panelGrid columns="2">
+                FirstNumber <apex:inputText value="{!FirstNumber}"/> 
+                SecondNumber <apex:inputText value="{!SecondNumber}"/> 
+            </apex:panelGrid>
+            <apex:panelGroup >
+                <apex:CommandButton value="+" action="{!Add}" />
+                <apex:CommandButton value="-" action="{!Substract}" />
+                <apex:CommandButton value="*" action="{!Multiply}" />
+                <apex:CommandButton value="/" action="{!Divide}" />
+            </apex:panelGroup>
+            <br/>
+            
+            <b> Result = <apex:outputText value="{!Result}"/> </b> 
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

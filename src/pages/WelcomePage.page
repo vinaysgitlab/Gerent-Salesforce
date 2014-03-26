@@ -1,0 +1,30 @@
+<apex:page standardController="Project__c">
+<apex:form >
+    <apex:sectionHeader title="Project Edit" Subtitle="{!Project__c.Name}"/>
+    <apex:pageBlock >
+        <apex:pageBlockButtons >
+            <apex:commandButton action="{!Save}" value="Save"/>
+            <apex:commandButton action="{!Cancel}" value="Cancel"/>            
+        </apex:pageBlockButtons>
+        <apex:pageBlockSection title="Project Edit">
+            <apex:inputField value="{!Project__c.Name}" required="true"/>
+            <apex:inputField value="{!Project__c.Client__c}" required="true"/>
+            <apex:actionRegion >
+            <apex:outputLabel value="Status" for="ProjectStatusId"/>  
+            <apex:inputField value="{!Project__c.Status__c}" Id="ProjectStatusId">
+                <apex:actionSupport event="onchange" reRender="AdditionalInformationId"/>
+            </apex:inputfield>
+            </apex:actionRegion>
+        </apex:pageBlockSection>
+        
+        <apex:pageBlockSection title="Additional Information" Id="AdditionalInformationId">
+            <apex:inputField value="{!Project__c.LOE_Hours__c}" required="{!Project__c.Status__c == 'Open'}"/>
+            <apex:inputField value="{!Project__c.Number_of_Hours__c}" required="{!Project__c.Status__c == 'Open'}"/>
+            <apex:inputField value="{!Project__c.Start_Date__c}" required="{!Project__c.Status__c == 'Open'}"/>
+            <apex:inputField value="{!Project__c.Estimated_End_Date__c}" required="{!Project__c.Status__c == 'Open'}"/>
+        </apex:pageBlockSection>
+        
+    </apex:pageBlock> 
+
+</apex:form>
+</apex:page>

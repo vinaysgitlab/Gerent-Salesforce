@@ -1,0 +1,30 @@
+<apex:page controller="disController">
+<apex:SectionHeader title="Calculator"/>
+    <apex:form >
+        <apex:pageBlock title="Recent Operations">
+            <apex:dataTable value="{!Calc}" var="c">
+                <apex:column >
+                    <apex:facet name="header"> <apex:outputLabel value="{!$ObjectType.Calculator__c.fields.Name.label}"/></apex:facet>
+                    <apex:outputText value="{!c.Name}" />
+                </apex:column>
+                <apex:column >
+                    <apex:facet name="header">  <apex:outputLabel value="{!$ObjectType.Calculator__c.fields.FirstNumber__c.label}"/> </apex:facet>
+                    <apex:outputText value="{!c.FirstNumber__c}" />
+                </apex:column>
+                <apex:column >
+                    <apex:facet name="header"> <apex:outputLabel value="{!$ObjectType.Calculator__c.fields.SecondNumber__c.label}"/>  </apex:facet>
+                    <apex:outputText value="{!c.SecondNumber__c}" />
+                </apex:column>
+                <apex:column >
+                    <apex:facet name="header">  <apex:outputLabel value="{!$ObjectType.Calculator__c.fields.Operation__c.label}"/>  </apex:facet>
+                    <apex:outputText value="{!c.Operation__c}" />
+                </apex:column>
+                <apex:column >
+                    <apex:facet name="header">  <apex:outputLabel value="{!$ObjectType.Calculator__c.fields.Result__c.label}"/> </apex:facet>
+                    <apex:outputText value="{!c.Result__c}" />
+                </apex:column>
+            </apex:dataTable>
+        </apex:pageBlock>
+    </apex:form>
+
+</apex:page>

@@ -1,0 +1,9 @@
+<apex:page standardController="Campaign" extensions="CampaignMemberCreateController">
+  <apex:form >
+        <apex:pageBlock title="Get Contract document">
+            <apex:pageBlockButtons >
+                <apex:commandButton action="{!CreateCampaignMember}" value="Click to Create Campaign Member"/>
+            </apex:pageBlockButtons>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

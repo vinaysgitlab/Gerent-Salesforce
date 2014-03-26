@@ -1,0 +1,107 @@
+<apex:page standardController="User" extensions="TermsOfUseController" action="{!autoRun}" docType="xhtml-1.0-transitional">
+    <head>
+        <title>{!$Label.TermsOfUseTitle}</title>
+        <apex:outputText >
+            <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.termsOfUseStatics)}/js/colorbox/css/colorbox.css" />
+            <script src="{!URLFOR($Resource.termsOfUseStatics)}/js/jquery/jquery-1.7.min.js"></script>
+            <script src="{!URLFOR($Resource.termsOfUseStatics)}/js/colorbox/jquery.colorbox-min.js"></script>
+        </apex:outputText>
+        <script type="text/javascript">
+
+        $(document).ready(function(){
+            
+            var btn ;
+            var isChecked = $('.agree').is(":checked");
+            if(!isChecked) {
+                btn = $('#cboxClose').detach();
+            }
+                        
+            $('.agree').change(function() {
+                var isChecked = $('.agree').is(":checked");
+                if(!isChecked) {
+                   btn = $('#cboxClose').detach();
+                } else {
+                    if (btn != null) {
+                       btn.appendTo('#cboxContent');
+                    }
+                }
+            });
+
+                //$.fn.colorbox({iframe:true, width:"80%", height:"80%", opacity:0.60, overlayClose:false, escKey:false, href:"http://salesforce.com", scrolling:true});
+//                if(!{!currentUser.Accepted_Terms_of_Use__c}){
+                $.fn.colorbox({
+                    inline:true, 
+                    width:"50%", 
+                    height:"60%", 
+                    opacity:0.60, 
+                    overlayClose:false, 
+                    escKey:false, 
+                    href:"#inline_content", 
+                    scrolling:true,
+                    onCleanup:
+                        function(){
+                            var wasChecked = {!currentUser.Accepted_Terms_of_Use__c};
+                            if ($('.agree').is(":checked") && !wasChecked )
+                            {
+                                TermsOfUseController.toggleHideTermsOfUse(true, 
+                                    function(result, event){
+                                        if (event.status) {
+                                            continueToChatter();
+                                        } else if (event.type === 'exception') {
+                                            alert(event.message);
+                                        } else {
+                                            alert(event.message);
+                                        }
+                                     }, {escape:true}); 
+                            } else {
+                                var isChecked = $('.agree').is(":checked");
+                                if(wasChecked && !isChecked) {
+                                
+                                TermsOfUseController.toggleHideTermsOfUse(isChecked, 
+                                    function(result, event){
+                                        if (event.status) {
+                                            continueToChatter();
+                                        } else if (event.type === 'exception') {
+                                            alert(event.message);
+                                        } else {
+                                            alert(event.message);
+                                        }
+                                     }, {escape:true}); 
+                                } else {
+                                    continueToChatter();
+                                }
+                             }
+                            //END OF onCleanup
+                        }
+                    });
+//                    }//END OF IF  {!currentUser.Accepted_Terms_of_Use__c};
+        });
+    </script>
+    </head>
+
+    <body>
+                        
+        <div class="layout-wrapper">
+            <div class="content-wrapper">
+            <chatter:feed entityId="{!$User.Id}"/>
+            <!-- This contains the hidden content for inline calls -->
+            <div style='display:none'>
+                <div id='inline_content' style='padding:10px; background:#fff; font-family:Arial,Helvetica,sans-serif;'>
+                    <div id="terms_of_use">
+                    </div>
+                <apex:form id="form">
+                    <div id="test" style="position: absolute; bottom: 0; left: 0;">
+                        <apex:inputCheckbox value="{!currentUser.Accepted_Terms_of_Use__c}" styleClass="agree" /> {!$Label.HideTermsOfUseLabel}
+                        <apex:actionFunction action="{!continueToChatter}" name="continueToChatter" rendered="true"/>
+                    </div>
+                </apex:form>
+                <div class="clear"></div>
+               </div>
+              </div>            
+            </div>
+        </div>
+        <script type="text/javascript">
+              $('#terms_of_use').load('{!URLFOR($Resource.TermsOfUseHTML)} #terms');
+        </script>
+    </body>
+</apex:page>

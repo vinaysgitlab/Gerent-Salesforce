@@ -1,0 +1,150 @@
+<!--
+    Copyright (c)2009, Marcel Will, Sales Engineering, Salesforce.com Inc.
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+    Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer. 
+    Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+    Neither the name of salesforce.com nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission. 
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+    SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+    LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
+    EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<apex:page id="CampaignMembershipManager" title="Campaign Membership Manager" controller="cmmCampaignMembershipManagerController" tabStyle="Campaign_Membership_Manager__tab">
+
+<script>
+    function checkAll(cb){
+        var inputElem = document.getElementsByTagName( "input" );
+        for( var i = 0; i < inputElem.length; i++ ){
+            if( inputElem[i].id.indexOf( "selectLine" ) != -1 ){
+                inputElem[i].checked = cb.checked;
+            }
+        }
+        updateCounter()
+    }
+</script>
+
+<apex:sectionHeader title="Campaign Membership Manager" description="{!$Label.CMM_App_Description}"/>   
+ 
+      <apex:pageBlock title="{!$Label.CMM_First_Step_Instruction}">
+      
+          <apex:pageBlockSection >
+              <apex:form rendered="{!NOT(ISNULL(Campaigns))}">
+          
+                <nobr>
+                <apex:selectList value="{!selectedCampaign}" multiselect="false" size="1">
+                    <apex:selectOptions value="{!Campaigns}"/>
+                </apex:selectList>
+                <apex:commandButton value="{!$Label.CMM_Go}" action="{!doSearch}" />
+                </nobr>
+              
+              </apex:form>
+          
+          </apex:pageBlockSection>
+          
+          <apex:outputPanel id="messagePanel1" rendered="true">
+            <apex:form >
+            <apex:pageMessage title="{!messageTitle}" summary="{!messageDetail}" rendered="{!messageShow}" severity="{!messageSeverity}" strength="1">
+            </apex:pageMessage>
+            </apex:form>
+          </apex:outputPanel>
+          
+          <apex:pageBlockSection title="{!$Label.CMM_Campaign_Description}" id="description" columns="1" rendered="{!NOT(ISNULL(Campaigns))}">
+            <apex:outputText value="{!CampaignDescription}" id="descriptiontext" />
+          </apex:pageBlockSection>
+          
+          <br/>
+          
+      </apex:pageBlock>
+      
+      <apex:form >      
+      <apex:pageBlock title="{!$Label.CMM_Second_Step_Instruction}" rendered="{!NOT(ISNULL(CampaignMembers))}">
+            <apex:pageBlockButtons >
+                <apex:commandButton value="{!$Label.CMM_Button_Remove}" action="{!processSelected}" rendered="{!NOT(ISNULL(CampaignMembers))}" />
+            </apex:pageBlockButtons> 
+            
+            <apex:outputPanel style="align: right;" id="SelectionStatus">
+                <apex:outputText value="{!$Label.CMM_Selected_Rows}: {0}">
+                    <apex:param value="{!selectedRows}"/>
+                </apex:outputText>&nbsp;&nbsp;
+                <apex:actionStatus startText="{!$Label.CMM_Requesting_Data}" stopText="" id="dataTableStatus" />
+                <br/><br/>
+            </apex:outputPanel>
+      
+            <apex:pageBlockSection title="{!$Label.CMM_Results}" id="results" columns="1">
+                
+                <apex:pageBlockTable value="{!CampaignMembers}" var="cMember" id="CampaignMemberTable" rendered="{!NOT(ISNULL(CampaignMembers))}">
+                
+                    <apex:column >
+                        <apex:facet name="header">
+                            <apex:inputCheckBox value="{!selectAllCheckbox}" onclick="checkAll(this)" />
+                        </apex:facet>
+                        <apex:inputCheckbox value="{!cMember.selected}" id="selectLine" onclick="updateCounter()" />
+                    </apex:column>
+                
+                    <apex:column rendered="{!ISNULL(cMember.campmem.LeadId)}">  
+                        <apex:facet name="header">Type</apex:facet>
+                        <apex:outputText value="Contact"/>
+                    </apex:column>                  
+                    <apex:column rendered="{!ISNULL(cMember.campmem.ContactId)}">
+                        <apex:facet name="header">Type</apex:facet>  
+                        <apex:outputText value="Lead"/>
+                    </apex:column> 
+                    
+                    <apex:column value="{!cMember.campmem.Contact.FirstName} {!cMember.campmem.Contact.LastName}" rendered="{!ISNULL(cMember.campmem.LeadId)}">   
+                        <apex:facet name="header">Name</apex:facet>
+                    </apex:column>                                       
+                    <apex:column value="{!cMember.campmem.Lead.FirstName} {!cMember.campmem.Lead.LastName}" rendered="{!ISNULL(cMember.campmem.ContactId)}">
+                        <apex:facet name="header">Name</apex:facet>
+                    </apex:column>      
+                    
+                    <apex:column value="{!cMember.campmem.Contact.Email}" rendered="{!ISNULL(cMember.campmem.LeadId)}">
+                        <apex:facet name="header">E-Mail</apex:facet>
+                    </apex:column>   
+                    <apex:column value="{!cMember.campmem.Lead.Email}" rendered="{!ISNULL(cMember.campmem.ContactId)}">
+                        <apex:facet name="header">E-Mail</apex:facet>
+                    </apex:column>
+                    
+                    <apex:column value="{!cMember.campmem.Contact.Account.Name}" rendered="{!ISNULL(cMember.campmem.LeadId)}">
+                        <apex:facet name="header">Company</apex:facet>
+                    </apex:column>   
+                    <apex:column value="{!cMember.campmem.Lead.Company}" rendered="{!ISNULL(cMember.campmem.ContactId)}">                    
+                        <apex:facet name="header">Company</apex:facet>
+                    </apex:column>  
+                    
+                    <apex:column value="{!cMember.campmem.Contact.MailingCity}" rendered="{!ISNULL(cMember.campmem.LeadId)}">
+                        <apex:facet name="header">City</apex:facet>
+                    </apex:column>   
+                    <apex:column value="{!cMember.campmem.Lead.City}" rendered="{!ISNULL(cMember.campmem.ContactId)}">                    
+                        <apex:facet name="header">City</apex:facet>
+                    </apex:column>                                                                          
+                
+                    <apex:column value="{!cMember.campmem.Status}"/>
+                    
+                </apex:pageBlockTable>
+
+            </apex:pageBlockSection> 
+            
+            <br/>
+            <apex:outputPanel id="NavigationStatus" layout="block" style="text-align: center;">
+                <apex:outputText value="{!$Label.CMM_Page} {!pageNumber} {!$Label.CMM_Of} {!totalPageNumber}" />    
+                <br/>
+                <apex:commandLink action="{!previousBtnClick}" id="PreviousLink" reRender="CampaignMemberTable, NavigationStatus, SelectionStatus" status="dataTableStatus" rendered="{!NOT(PreviousButtonEnabled)}"><apex:image url="{!URLFOR($Resource.CampaignMembershipManagerResources, UserLanguage + '/previous_active.png')}" /></apex:commandLink>
+                <apex:image url="{!URLFOR($Resource.CampaignMembershipManagerResources, UserLanguage + '/previous_inactive.png')}" rendered="{!PreviousButtonEnabled}" />
+                <apex:commandLink action="{!nextBtnClick}" id="NextLink" reRender="CampaignMemberTable, NavigationStatus, SelectionStatus" status="dataTableStatus" rendered="{!NOT(NextButtonEnabled)}"><apex:image url="{!URLFOR($Resource.CampaignMembershipManagerResources, UserLanguage + '/next_active.png')}" /></apex:commandLink>
+                <apex:image url="{!URLFOR($Resource.CampaignMembershipManagerResources, UserLanguage + '/next_inactive.png')}" rendered="{!NextButtonEnabled}" />
+            </apex:outputPanel>
+             
+        </apex:pageBlock>
+        
+        <apex:actionFunction action="{!updateSelectedList}" name="updateCounter" rerender="SelectionStatus" />
+        
+        </apex:form>  
+
+</apex:page>
